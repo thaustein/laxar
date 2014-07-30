@@ -15,6 +15,7 @@
   NEW FEATURE: see ticket for details
 - [#40](https://github.com/LaxarJS/laxar/issues/40): portal: fixed 'flag-topic' pattern.
 
+
 ## v0.11.0
 
 - [#39](https://github.com/LaxarJS/laxar/issues/39): portal: added JSON-schema formats 'topic', 'sub-topic' and 'flag-topic' to widget loader.
@@ -29,6 +30,7 @@
 - [#32](https://github.com/LaxarJS/laxar/issues/32): Configuration: Consolidated and documented configuration options under docs/manuals/configuration.md
   NEW FEATURE: see ticket for details
 - [#30](https://github.com/LaxarJS/laxar/issues/30): PageLoader: added missing check for duplicate composition ids.
+
 
 ## v0.10.0
 
