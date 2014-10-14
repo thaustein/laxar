@@ -2,6 +2,10 @@
 
 ## Last Changes
 
+- [#83](https://github.com/LaxarJS/laxar/issues/83): portal: provided a timestamp service with a mock that works with jasmine
+  NEW FEATURE: see ticket for details
+
+
 ## v0.15.0
 
 - [#82](https://github.com/LaxarJS/laxar/issues/82): implemented directives axId and axFor
