@@ -11,9 +11,9 @@ Widgets and activities are the work horse of any LaxarJS application.
 They make up the user interface and implement the (client-side) application logic.
 
 
-## Delineating Widget Responsibilities
+## Widget Responsibilities
 
-Before starting to implement your widget, take a moment to think about it's responsibilities.
+Before starting to implement your widget, take a moment to think about and delineate it's responsibilities.
 You can do this by phrasing the question: _What task(s) does this widget help the user to accomplish?_
 Are you thinking about a very broadly applicable, technical task such as _"allow the user to enter a date"_ or _"allow user to delete a data row"_?
 In this case, you might want to implement this functionality as a _control_ (an AngularJS directive, or an HTML5 web component) and use it _within_ one or more of your widgets.
@@ -37,8 +37,8 @@ The easiest way to create a widget is to use the appropriate `grunt-init` templa
 Check out the [README](../../README.md) on how to obtain the grunt-init templates and on creating an application.
 
 First, create a sub-directory for your new widget within a LaxarJS application:
-Each widget in the application lives within a sub-folder such as `includes/widgets/shopping/cart_widget`.
-In this example, _shopping_ is the widget category, which you an opportunity to organize widgets by their general business area: _shopping_, _social_, _finance_ and so on.
+Each widget in the application lives within a sub-folder such of `includes/widgets`, such as `includes/widgets/shopping/cart_widget`.
+In this example, _shopping_ is the widget category, intended to organize widgets by their general business area: _shopping_, _social_, _finance_ and so on.
 Next comes the widget name, which has to be application-wide unique.
 Widgets always end in `_widget` whereas activities always end in `_activity`.
 
@@ -82,12 +82,13 @@ A newly created widget contains the following files:
 
 * `default.theme/(s)css/cart_widget.(s)css`
 
-  Most of the time, your widget is fine using CSS style definitions from the global application theme.
+  Most of the time, your widget is fine just using CSS style definitions from the global application theme.
+  In this case, it can do completely without CSS (or SCSS) folders.
   Sometimes though, you have style definitions which are widget-specific (such as CSS animations) and should not be part of the global theme.
   If your widget has a CSS file, the framework will load it when the widget is used in an application, and bundle it for release.
 
-LaxarJS supports to change the appearance of an existing widget by overriding its template in a custom _theme_.
-To get started and to add some simple styling, you do not have to concern yourself with themes, but they are very useful in adapt widgets to different applications and web sites.
+LaxarJS supports to change the appearance of an existing widget by overriding its template in a custom _theme_, and to put shared definitions (CSS classes and SCSS variables) into that theme.
+To get started and with some simple styling, you do not have to concern yourself with themes or SCSS, but they are very useful for adapting widgets to different applications and web sites.
 Read [more about themes](./themes.md) when you are familiar with creating and using widgets.
 
 * `spec/spec_runner.html`
@@ -106,7 +107,11 @@ Read [more about themes](./themes.md) when you are familiar with creating and us
   The test harness providing a simulated LaxarJS event bus is already prepared.
 
 
+
 ### Implementing a Controller
+
+The controller contains a widget's business logic.
+For our very simple shopping cart, it knows how to sum the contents of a cart, and how to increase or decrease the quantity of individual positions within the cart.
 
 LaxarJS creates an empty controller for you, along with some AngularJS infrastructure (module, injections).
 For a shopping cart, this might be an appropriate implementation based on some dummy data.
@@ -116,18 +121,20 @@ For a shopping cart, this might be an appropriate implementation based on some d
     // ...
 
     function Controller( $scope ) {
-       $scope.model = [ { label: "Dairy Dreams", price: 5.25, amount: 1 },
-                        { label: "Milky Mocha", price: 12.75, amount: 3 },
-                        { label: "Freezing Frappé", price: 18.25, amount: 1 } ];
-
+       $scope.model = [
+          { label: 'Dairy Dreams', price: 5.25, amount: 1 },
+          { label: 'Milky Mocha', price: 12.75, amount: 3 },
+          { label: 'Freezing Frappé', price: 18.25, amount: 1 }
+       ];
+ 
        $scope.increment = function( item ) {
           ++item.amount;
        };
-
+ 
        $scope.decrement = function( item ) {
           item.amount = Math.max( 0, item.amount - 1 );
        };
-
+ 
        $scope.total = function( rows ) {
           return rows.reduce( function( acc, next ) {
              return acc + next.price*next.amount;
@@ -140,12 +147,12 @@ For a shopping cart, this might be an appropriate implementation based on some d
 ```
 
 We can see that a widget controller works just like any other AngularJS controller.
-Of course, things will get more interesting once we use the event bus.
+Of course, things will get more interesting once we use the event bus to receive shopping cart contents from somewhere else, or to signal that an order should be placed.
 
 
 ### Creating a Template
 
-For anyone familiar with bootstrap and AngularJS, this should not be a surprise:
+For anyone familiar with bootstrap and AngularJS, most of this should not be a surprise:
 
 ```HTML
 
@@ -178,8 +185,16 @@ For anyone familiar with bootstrap and AngularJS, this should not be a surprise:
 
 ```
 
+The scope of the template is the same as for the controller, so that `model`, `decrement`, `increment` and `total` will be available upon template instantiation.
+The `features` property used within the headline comes from the _widget configuration_, which is described below.
+
 
 ### Adding Some Style
+
+A widget may be styled using CSS.
+LaxarJS supports generating the CSS from [SCSS](http://sass-lang.com/) source files using the folder, which allows to place common definitions for font size, color and much more within a shared "theme" folder.
+To keep things simple, you can skip that and simply write a CSS file for your widget, in our case under `default.theme/css/cart_widget.css`.
+Once you are familiar with the basics, read the article on [creating themes](./creating_themes.md) for more information.
 
 Thanks to Bootstrap, this widget does not require a lot of fancy styling:
 
@@ -206,14 +221,7 @@ For this reason, we make it configurable, by adding a feature entry to the `widg
 
     {
        "name": "CartWidget",
-       "description": "A simple shopping cart.",
-       "version": {
-          "spec": "0.1.0"
-       },
-
-       "integration": {
-          "type": "angular"
-       },
+       "description": "Allows Users to Review and Modify Purchase Items",
 
        "features": {
           "$schema": "http://json-schema.org/draft-04/schema#",
@@ -237,11 +245,12 @@ For this reason, we make it configurable, by adding a feature entry to the `widg
 The _widget features_ are a [JSON schema](http://json-schema.org) document used by LaxarJS to verify pages.
 It contains a property for each configurable feature, and it also allows to specify default values as needed.
 This makes it easy to provide self-documenting customization options to your widget.
+See the reference section below for details on the widget specification.
 
 
 ### Checking out the Result
 
-Before we can take a look at the widget, we will need to integrate it into the page (`application/pages/page1.json`) provided by the demo application:
+Before we can take a look at the widget, we will need to integrate it into the page provided by the application template (`application/pages/page1.json`).
 
 ```JSON
 
@@ -267,42 +276,161 @@ Before we can take a look at the widget, we will need to integrate it into the p
 
 ```
 
+There is another manual to learn more about [writing pages](./writing_pages.md).
 Now we can start the development web server provided by LaxarJS, from the application root:
 
 ```SH
 
+    npm install # if you haven't already
     npm start
 
 ```
 
-By navigating to `http://localhost:8000`, you may admire the fruits of your labor:
+Navigate to `http://localhost:8000/debug.html` to admire the fruits of your labor:
 
 ![CartWidget](widgets_and_activities/cart_widget.png)
 
-Now that we have covered the basics in writing widgets, let us have a closer look at widget testing.
+Now that you have learned the basics in creating widgets, take closer look at widget testing.
 
 
 ## Testing a Widget
 
-One of the Major Goals of LaxarJS is to simplify the development _and testing_ of isolated components.
-For this reason, the testing infrastructure for your widget has already been added on creation.
+One of the major Goals of LaxarJS is to simplify the development _and testing_ of isolated components.
+For this reason, the testing infrastructure for your widget has already been added when using `grunt-init`.
 
-### Writing a Spec-Test
 
-TODO
+### Writing Spec-Tests
+
+LaxarJS contains a testing infrastructure to mock out the LaxarJS runtime, effectively running your widget in a sandbox or _test bed_ as it is called in LaxarJS.
+A skeleton spec is provided for you: it contains code to prepare the test bed with sample configuration and to instantiate your controller.
+
+To mock out AngularJS services such as `$http` you can work with [ngMocks](https://docs.angularjs.org/api/ngMock) just like you would do without LaxarJS.
+To add a simple test for our widget, replace the existing dummy test
+
+```JS
+
+    it( 'still needs some tests.' );
+
+```
+
+with a more useful spec:
+
+```JS
+
+    it( 'allows to calculate a total of its contents', function() {
+        expect( testBed_.scope.total( testBed_.scope.model ) ).toEqual( 61.74 );
+    } );
+
+```
+
+Tests get more interesting when you instrument the testbed to publish mock events to be handled by the widget controller, and in turn to inspect events published by the widget.
+For more details on testing event bus communication, refer to the [article on events](./events.md). 
+
 
 ### Running the Test
 
-TODO
+Now make sure that the development web server is still running, and check out the test results using the [provided spec runner](http://localhost:8000/includes/widgets/shopping/cart_widget/spec/spec_runner.html):
+
+![CartWidget](widgets_and_activities/cart_widget_spec.png)
+
+Alternatively, you can run the tests for all your widgets from the command line:
+
+```JS
+
+    npm test
+
+```
+
+LaxarJS provides [grunt tasks](https://github.com/LaxarJS/grunt-laxar) for testing that automatically set up and run [PhantomJS](http://phantomjs.org/) for you, so you should not run into problems accessing the DOM. 
+Hopefully, this makes it simple to set up continuous integration for your application.
+
 
 ## LaxarJS Widget Reference
 
-TODO
+Building on top of the basics covered so far, sometimes it is helpful to know about all the options available to widget authors.
+This section covers the details of the widget specification format, and of the LaxarJS test bed.
 
-### Scope Properties
 
-TODO
+### The Widget Scope
+
+The widget controller and the template have access to the widget scope.
+The scope may be used by widget controllers to communicate with directives such as `ngForm`. 
+To avoid entanglement, multiple widgets (even if nested) do *not* communicate through the scope, but *always use the event bus* for this.
+
+* `$scope.eventBus`
+
+  Most of the time, this is the only LaxarJS scope property used by widget controllers.
+  Of course, controllers will add their own properties almost always.
+
+* `$scope.widget.id`
+
+  A unique identifier for this widget within the page.
+  You can use it to generate unique DOM IDs, for example to connect `label` and `input` elements in an HTML form.
+
 
 ### The Widget Specification Format
 
-TODO
+Each widget has a `widget.json` file which is also called _widget specification_.
+LaxarJS contains a [widget schema definition](../../static/schemas/widget.json) that defines the exact format of this file.
+These are the most important widget properties:
+
+* `name`
+
+  This required field contains the _CamelCase_ version of the widget's directory name.
+
+* `description`
+
+  What this widget is about. 
+  Ideally, this contains the main _user-goal_ mentioned in the first section.  
+
+* `features`
+
+  The widget features. 
+  This is a JSON schema document that documents all configurable widget features.
+  For each widget instance used on page, LaxarJS will check the feature configuration of that instance against this schema.
+  This also allows to provide default values for configuration options. 
+
+* `compatibility`
+
+  An optional list of new LaxarJS features that this widget is compatible with.
+  It allows individual widgets to _opt in_ to breaking LaxarJS changes (similarly to the Python _import from future_ construct), without harming widgets that do not yet support these changes.
+
+* `controls`
+
+  An optional list of LaxarJS controls used by this widget.
+  Each control is represented by its RequireJS path.
+  This allows the LaxarJS runtime to automatically load the AngularJS modules and CSS styles associated with these controls.
+
+
+### The LaxarJS Widget Test Bed
+
+The LaxarJS spec test boilerplate (created for you by grunt init) creates a `testBed_` instance which is re-initialized prior to running each test case.
+It has the following essential properties.
+
+* `testBed_.featuresMock`
+
+  The feature configuration that would be provided through the page definition of an actual application.
+  This must be set before calling `testBed_.setup()`.
+
+* `testBed_.setup()`
+
+  Creates the widget controller.
+  Afterwards, the `testBed_.scope` is available.
+  This simulates navigating to a page that contains an instance of the widget under test.
+
+* `testBed_.tearDown()`
+
+  Destroys the widget controller.
+  This is the testing equivalent to navigating away from the page that contains the widget instance.
+
+* `testBed_.scope`
+
+  The AngularJS scope that was created for this widget.
+  This allows to check widget state in white-box tests.
+
+* `testBed_.eventBusMock`
+
+  A test handle to the LaxarJS event bus, allowing the spec to "impersonate" other widgets on the same page.
+  Through it, the spec test can send events for manipulating the widget, and in turn subscribe to events published by the widget controller.
+  This is different from the `testBed_.scope.eventBus` used by the widget controller.
+  Test may use `spyOn` on the scope event bus to monitor widget behaviour directly, or interact with the eventBusMock to communicate with the widget indirectly.    
