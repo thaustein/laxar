@@ -7,17 +7,18 @@ Preliminary readings:
 
 # Widgets and Activities
 
-Widgets and activities are the work horse of any LaxarJS application.
-They make up the user interface and implement the (client-side) application logic.
+Widgets and activities are the _"work horse"_ of any LaxarJS application.
+They make up the bulk of the user interface and provide all client-side application logic.
 
 
 ## Widget Responsibilities
 
-Before starting to implement your widget, take a moment to think about and delineate it's responsibilities.
+Before starting to implement your widget, take a moment to think and delineate it's responsibilities.
 You can do this by phrasing the question: _What task(s) does this widget help the user to accomplish?_
-Are you thinking about a very broadly applicable, technical task such as _"allow the user to enter a date"_ or _"allow user to delete a data row"_?
+Are you thinking about a very broadly applicable, technical task such as _"allow the user to enter a date"_ or _"allow the user to delete a data row"_?
 In this case, you might want to implement this functionality as a _control_ (an AngularJS directive, or an HTML5 web component) and use it _within_ one or more of your widgets.
-Usually, widgets correspond to significant areas of the screen and are composed from multiple controls, to allow the user to accomplish _specific_ tasks, such as _"allow user to book a flight"_ or _"allow user to review shopping cart contents"_.
+
+Usually, widgets correspond to significant areas of the screen and are composed from multiple controls, to allow the user to accomplish _specific_ tasks, such as _"allow the user to book a flight"_ or _"allow the user to review shopping cart contents"_.
 If widgets are made too small and too generic, page definitions will be confusing and the widget configuration options become unwieldy.
 As a rule of the thumb, only very complex pages should contain more than a about a dozen widgets.
 And who wants to have very complex pages anyway?
@@ -27,6 +28,11 @@ And who wants to have very complex pages anyway?
 
 Activities are often used to fetch and manage application resources.
 Within the page, they may represent a REST API or a data store, and are responsible for fetching resources and performing relevant service calls (such as a form submission) upon action request.
+This makes Activities perform a role similar to AngularJS services.
+The advantage over services is that using activities puts the page author in control over the instantiation and configuration.
+Different widget instances may each be connected to their own activity instance, or share an event bus topic with a single instance.
+These scenarios are not always impossible with Angular-DI and services, but are much less obvious and not declarative. 
+
 Activities may also serve as a mediator between other widgets that use mutually incompatible event vocabularies (such as different resource formats).
 This may happen when integrating widgets from third parties into an application.
 
@@ -360,7 +366,7 @@ To avoid entanglement, multiple widgets (even if nested) do *not* communicate th
 * `$scope.eventBus`
 
   Most of the time, this is the only LaxarJS scope property used by widget controllers.
-  Of course, controllers will add their own properties almost always.
+  Of course, controllers will almost always add their own properties.
 
 * `$scope.widget.id`
 
