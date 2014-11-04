@@ -418,7 +418,7 @@ These are the most important widget properties:
 
   The widget features.
   This is a JSON schema document that documents all configurable widget features.
-  For each widget instance used on page, LaxarJS will check the feature configuration of that instance against this schema.
+  For each widget instance used on a page, LaxarJS will check the feature configuration of that instance against this schema.
   This also allows to provide default values for configuration options.
 
 * `compatibility`
@@ -466,4 +466,4 @@ It has the following essential properties.
   A handle to the LaxarJS event bus that allows spec tests to simulate other widgets on the same page.
   Through it, the spec test can publish events for manipulating the widget, and in turn subscribe to events published by the widget controller.
   This is different from the `testBed_.scope.eventBus` handle which is used by the widget controller.
-  Test may use `spyOn` on the scope event bus to monitor widget behaviour directly, or interact with the eventBusMock to communicate with the widget indirectly.
+  Tests may use `spyOn` on the scope event bus to monitor widget behaviour directly, or interact with the `eventBusMock` to communicate with the widget indirectly.
