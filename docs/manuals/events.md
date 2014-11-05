@@ -162,18 +162,18 @@ Widgets that need to save state to a service should respond with a `willEndLifec
 
 Event name                            | Payload Attribute | Description
 --------------------------------------|-------------------| ------------------------------------------------------------
-`beginLifecycleRequest.{lifecycleId}` |                   | _published by the runtime to tell widgets that publishing event is safe now_
+`beginLifecycleRequest.{lifecycleId}` |                   | _published by the runtime to tell widgets that publishing of events is safe now_
                                       | `lifecycleId`     | the lifecycle ID (currently, this is always `"default"`)
-`willBeginLifecycle.{lifecycleId}`    |                   | _published by widgets to defer page rendering (not recommended)_
-                                      | `lifecycleId`     | (see above)
-`didBeginLifecycle.{lifecycleId}`     |                   | _published by widgets when page rendering may commence (not recommended)_
-                                      | `lifecycleId`     | (see above)
+`willBeginLifecycle.{lifecycleId}`    |                   | _published by widgets and activities to defer page rendering (not recommended)_
+                                      | `lifecycleId`     | _see above_
+`didBeginLifecycle.{lifecycleId}`     |                   | _published by widgets and activities when page rendering may commence (not recommended)_
+                                      | `lifecycleId`     | _see above_
 `endLifecycleRequest.{lifecycleId}`   |                   | _published by the runtime to tell widgets that the page is about to be destroyed_
-                                      | `lifecycleId`     | (see above)
-`willEndLifecycle.{lifecycleId}`      |                   | _published by widgets to defer tear down of the page (if necessary)_
-                                      | `lifecycleId`     | (see above)
-`didEndLifecycle.{lifecycleId}`       |                   | _published by widgets when page tear down may commence (after deferring it)_
-                                      | `lifecycleId`     | (see above)
+                                      | `lifecycleId`     | _see above_
+`willEndLifecycle.{lifecycleId}`      |                   | _published by widgets and activities to defer tear down of the page (if necessary)_
+                                      | `lifecycleId`     | _see above_
+`didEndLifecycle.{lifecycleId}`       |                   | _published by widgets and activities when page tear down may commence (after deferring it)_
+                                      | `lifecycleId`     | _see above_
 
 
 
@@ -201,28 +201,26 @@ Here is the summary of navigation events:
 
 Event name                 | Payload Attribute | Description
 ---------------------------|-------------------| ------------------------------------------------------------
-`navigateRequest.{target}` |                   | _published by widgets/activities to indicate that navigation has been requested_
+`navigateRequest.{target}` |                   | _published by widgets and activities to indicate that a navigation has been requested_
                            | `target`          | the navigation target (used in the payload _as well as_ in the event name)
                            | `data`            | a map from place parameter names to parameter values
 `willNavigate.{target}`    |                   | _published by the runtime to indicate that navigation has started_
-                           | `target`          | (see above)
-                           | `data`            | (see above)
+                           | `target`, `data`  | _see above_
 `didNavigate.{target}`     |                   | _published by the runtime to indicate that navigation has finished_
-                           | `target`          | (see above)
-                           | `data`            | (see above)
+                           | `target`, `data`  | _see above_
                            | `place`           | the actual place that was navigated to, now the current place
 
-More information on navigation is available in the [flow and places manual](./flow_and_places.md)
+More information on navigation is available in the ["Flow and Places" manual](./flow_and_places.md).
 
 #### Locales and i18n
 
-Events related to locales are described in the [i18n manual](./i18n.md).
+Events related to locales are described in the ["i18n" manual](./i18n.md).
 
 
 ### More Patterns
 
 The patterns described so far are used mainly for widgets to interact with the LaxarJS runtime.
-For application patterns that help widgets to interact with each other, refer to the [LaxarJS Patterns documentation](//github.com/LaxarJS/laxar_patterns/docs/index.md).
+For application patterns that help widgets to interact with each other, refer to the [LaxarJS Patterns documentation](//github.com/LaxarJS/laxar_patterns/tree/master/docs/index.md).
 
 
 ## Event Reference
