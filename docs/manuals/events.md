@@ -5,16 +5,16 @@ Preliminary readings:
 * [LaxarJS Core Concepts](../concepts.md)
 
 
-# Events and Publish/Subscribe
+# Events and Publish-Subscribe
 
 The key concept that distinguishes LaxarJS applications from other AngularJS applications is the _publish-subscribe_ (or _pub/sub_) architecture.
 It helps to isolate building blocks such as widgets and activities by moving the coupling from implementation (no module imports, no service contracts) to configuration (of event topics).
 
-LaxarJS consistently uses the term _events_ rather than _messages_, to point out two key aspects of its event architecture:
+LaxarJS consistently uses the term _events_ rather than _messages_, to point out two key aspects of its pub/sub-architecture:
  * events convey information about _what happened_ (rather than _who is receiver_)
  * delivery is always _asynchronous_ (using an _event loop_)
 
-Due to the latter, you may also think of this pattern as a variation on the _hollywood principle_ ("Don't call us, we'll call you").
+For these reasons, you may also think of this pattern as a variation on the _hollywood principle_ ("Don't call us, we'll call you").
 
 For efficient processing, LaxarJS ties into the AngularJS `$digest`-cycle.
 This allows the web browser to batch event-handling with other operations that modify screen contents.
@@ -67,25 +67,25 @@ For example, the event _didValidate.popup-user2_ informs all interested subscrib
 This information can now be used to show validation messages at the appropriate location.
 Sometimes there is a _modal third topic_, broadly describing _how_ something happened (e.g. to communicate an outcome such as `SUCCESS` or `ERROR`).
 
-Of course, nothing prevents senders to break these rules and use any structure for their event names as long as they conform to the grammar. 
+Of course, nothing prevents senders to break these rules and use any structure for their event names as long as they conform to the grammar.
 But for best interoperability between widgets and activities, not only should the general structure of event names be observed.
 
 It is recommended wherever possible for widgets to use one or more of the established _event patterns_:
 These patterns consist of event vocabularies and minimal associated semantics that have been identified during the development of LaxarJS.
 A few [core patterns](core-patterns) are baked right into the LaxarJS runtime, and these are listed below.
 Other useful patterns are described in the separate project _[LaxarJS Patterns](//github.com/LaxarJS/laxar_patterns)_.
-Even without using the LaxarJS Patterns _library_, widget authors are very much encouraged to use the [event vocabularies](//github.com/LaxarJS/laxar_patterns/docs/index.md) whenever meaningful. 
+Even without using the LaxarJS Patterns _library_, widget authors are very much encouraged to use the [event vocabularies](//github.com/LaxarJS/laxar_patterns/docs/index.md) whenever meaningful.
 
 
 ### Event Payload
 
-An event does not only have a name, but also a _payload_. 
+An event does not only have a name, but also a _payload_.
 Any JavaScript object that can be directly represented as [JSON](http://json.org/) can be used as a payload.
-This allows for the object to contain instances of _string_, _array_, _number_, _boolean_ and _object_, including `null`. 
+This allows for the object to contain instances of _string_, _array_, _number_, _boolean_ and _object_, including `null`.
 On the other hand, it excludes`undefined`, _Date_, _RegExp_ and custom classes.
 
 The Event Bus will _create a copy_ of the payload _for each subscriber_ that gets the event delivered.
-This improves decoupling and robustness, because events are "fire and forget": 
+This improves decoupling and robustness, because events are "fire and forget":
 A widget may publish some resource through an event and afterwards immediately modify its contents, but all subscribers are guaranteed to receive the original event.
 
 However, this also means that you should only publish resources that are at most ~100 kilobyte in size.
@@ -93,47 +93,47 @@ For larger resources, it is recommended to only transfer a URL so that intereste
 
 
 <a name="request-events"></a>
-### Request and Response using the Request/Will/Did Mechanism 
+### Two-Way Communication or the Request/Will/Did Mechanism
 
 Sometimes a widget has to request for some other widget or activity on the page to perform some action.
 This might be a longer running action such as a search or some server side validation.
 The requesting widget does not care about _who_ actually performs the request, but it is interested in _when_ the request has been fully processed by all respondents, and what is the outcome.
 
-As an example, consider a multi-part user sign-up process, where each of the several widgets allows the user to enter and validate some of the information such as E-Mail Address, payment information and a CAPTCHA.
-Another widget offering a _Complete Registration_ button would be responsible for the overall process of submitting the registration resource to a REST service and navigating to a different page.   
+As an example, consider a multi-part user sign-up process, where each of several widgets allows the user to enter and validate some of the information such as E-Mail Address, payment information or a CAPTCHA.
+Another widget offering a _Complete Sign-Up_ button would be responsible for the overall process of submitting the registration resource to a REST service and navigating to a different page.
 Before hitting the registration service, this widget would ask all input widgets to validate their respective validation details in order to provide immediate feedback to the user.
 Some of the widgets might have to query their own validation services though, such as the CAPTCHA widget.
 
-With the _Request/Will/Did_ mechanism such a scenario can be achieved without the registration widget having to know any of the participant widgets:
+Using the _Request/Will/Did_ mechanism, such functionality can be achieved without the registration widget having to know any of the participant widgets:
 
-1. The individual widgets have been _configured_ (through the page definition) to work with a `"registrationForm"` resource.
-   The input widgets that offer validation subscribe to `"validateRequest"` events related to this resource in order to support validation.
+1. The individual widgets are _configured_ on the page to work with a common `registrationForm` resource.
+   On instantiation, the input widgets offering validation subscribe to `validateRequest` events for this resource.
 
-2. When the user activates the _Complete Registration_  button, the registration widget issues a `"validateRequest.registrationForm"` event, indicating that
-  
-  * a validation has been requested (_what happened_) and
-  * it concerns the resource _"registrationForm"_ (_where_ it happened).
-  
+2. When the user activates the _Complete Sign-Up_ button, the registration widget issues a `validateRequest.registrationForm` event, indicating that
+
+  * a validation has been requested _(what happened)_ and
+  * it concerns the resource `registrationForm` _(where_ it happened).
+
   The registration widget may now disable its button and start showing an activity indicator to help the user recognize that an action is in progress.
 
-3. During delivery, the input widgets supporting validation will publish a `"willValidate.registrationForm"` event to indicate that
+3. During delivery, the input widgets supporting validation receive the request and will publish a `willValidate.registrationForm` event to indicate that
 
-  * a validation has started (_what_) and
-  * that it concerns the `"registrationForm"` resource (_where_).
-  
-4. Each of the widgets will either call its registration service to respond asynchronously, or publish a response directly if it can be computed locally and quickly.
-   The response has the form `"didValidate.registrationForm.SUCCESS"` or `"didValidate.registrationForm.ERROR"` conveying that
-   
-  * a validation has been performed (_what_) and
-  * that it concerns the `"registrationForm"` resource (_where_) and
-  * the way the validation turned out (_how_).
+  * a validation is about to begin _(what)_ and
+  * that it concerns the `registrationForm` resource _(where)_.
 
-4. Once all responses have been gathered and there were no validation errors, the registration form will be notified (through a promise) and the REST request may be performed.
+4. Each widget will either call its registration service to respond asynchronously, or publish a response directly if it can validate locally.
+   The response is either `didValidate.registrationForm.SUCCESS` or `didValidate.registrationForm.ERROR` conveying that
 
-The most important property of this mechanism is that any of the widgets on the page may be removed or replaced without any of the other widgets having to know.
+  * a validation has been performed _(what)_ and
+  * that it concerns the `registrationForm` resource _(where)_ and
+  * the way the validation turned out _(how)_.
+
+4. Once all responses have been collected and there were no validation errors, the registration form will be notified (through a promise) and the _sign-up_ REST request may be performed.
+
+This mechanism allows any of the widgets on the page may be removed or replaced without any of the other widgets having to know.
 New widgets may be added at any time, and will work as long as they support the validation pattern.
-Even if not, they might still be used, and their validation would be handled by the server upon submission of the registration form.
-Another widget could be added to gather and display validation messages to the user, simply by hooking it up to the same resource and processing its `"didValidate"` events.
+For example, message display widget could be added to gather and display validation messages to the user, simply by hooking it up to the same resource and processing its `"didValidate"` events.
+Even if some widgets do not support the validation pattern, they can still be used, only that their validation would have to be handled by the server upon submission of the registration form.
 
 Validation and other patterns are described in the [pattern reference](#pattern-reference) below.
 
@@ -144,23 +144,79 @@ Validation and other patterns are described in the [pattern reference](#pattern-
 A few event patterns are supported directly by LaxarJS, while others are described in the _LaxarJS Patterns_ library.
 Have a good look at all of them before coming up with your own patterns, in order to maximize the synergy of your widgets, especially when aiming for reuse.
 
+<a name="core-pattern"></a>
 ### Core Patterns
 
-TODO
+The core event patterns allow widgets to interact with the LaxarJS runtime.
+They are related to initialization and
 
 #### Page Life Cycle
 
-TODO
+After all widget controllers have been instantiated, the runtime publishes a `beginLifecycleRequest` event.
+Widgets that need to publish events on page load should do so _after_ receiving this event, ensuring that all receivers have been set up when their events are delivered.
+A will/did-response may be used by widgets to defer rendering of the page until they have been initialized, which is usually not recommended.
 
+Before [navigating](#navigation) away from a page, the runtime publishes the `endLifecycleRequest` event.
+Widgets that need to save state to a service should respond with a `willEndLifecycle` event, perform their housekeeping and publish an `didEndLifecycle` when done.
+
+
+Event name                            | Payload Attribute | Description
+--------------------------------------|-------------------| ------------------------------------------------------------
+`beginLifecycleRequest.{lifecycleId}` |                   | _published by the runtime to tell widgets that publishing event is safe now_
+                                      | `lifecycleId`     | the lifecycle ID (currently, this is always `"default"`)
+`willBeginLifecycle.{lifecycleId}`    |                   | _published by widgets to defer page rendering (not recommended)_
+                                      | `lifecycleId`     | (see above)
+`didBeginLifecycle.{lifecycleId}`     |                   | _published by widgets when page rendering may commence (not recommended)_
+                                      | `lifecycleId`     | (see above)
+`endLifecycleRequest.{lifecycleId}`   |                   | _published by the runtime to tell widgets that the page is about to be destroyed_
+                                      | `lifecycleId`     | (see above)
+`willEndLifecycle.{lifecycleId}`      |                   | _published by widgets to defer tear down of the page (if necessary)_
+                                      | `lifecycleId`     | (see above)
+`didEndLifecycle.{lifecycleId}`       |                   | _published by widgets when page tear down may commence (after deferring it)_
+                                      | `lifecycleId`     | (see above)
+
+
+
+<a name="navigation"></a>
 #### Navigation
 
-TODO
+Widgets and activities may initiate navigation using a `navigateRequest.{target}` event, substituting an actual navigation target instead of the placeholder `{target}`.
+The event is interpreted by the LaxarJS runtime as follows:
+
+  * if _target_ is `"_self"`, the runtime will simply propagate its place-parameters by publishing a `didNavigate` event right away
+  * if _target_ is one of the targets configured for the current place (in the flow definition), the runtime will initiate navigation to the corresponding place
+  * otherwise, if _target_ is a place within the flow definition, the runtime will initiate navigation to that place
+  * otherwise, nothing will happen.
+
+When _initiating navigation_, the LaxarJS runtime will:
+
+  1. extract any place parameters from the event payload of the request event
+  2. publish a `willNavigate.{target}` event with the corresponding target and parameters
+  3. publish an `endLifeCycle` event and wait any respondents
+  4. perform navigation by destroying the current page and loading the page associated with the new place
+  3. publish a `beginLifeCycle` event and wait any respondents
+  5. publish a `didNavigate.{target}` event, with the corresponding target and parameters as well as the resolved place
+
+Here is the summary of navigation events:
+
+Event name                 | Payload Attribute | Description
+---------------------------|-------------------| ------------------------------------------------------------
+`navigateRequest.{target}` |                   | _published by widgets/activities to indicate that navigation has been requested_
+                           | `target`          | the navigation target (used in the payload _as well as_ in the event name)
+                           | `data`            | a map from place parameter names to parameter values
+`willNavigate.{target}`    |                   | _published by the runtime to indicate that navigation has started_
+                           | `target`          | (see above)
+                           | `data`            | (see above)
+`didNavigate.{target}`     |                   | _published by the runtime to indicate that navigation has finished_
+                           | `target`          | (see above)
+                           | `data`            | (see above)
+                           | `place`           | the actual place that was navigated to, now the current place
+
+More information on navigation is available in the [flow and places manual](./flow_and_places.md)
 
 #### Locales and i18n
 
-TODO
-
-#### Themeing, Visibility and  Layout
+Events related to locales are described in the [i18n manual](./i18n.md).
 
 
 ### More Patterns
@@ -180,7 +236,7 @@ It only has a few essential methods that allow to implement all patterns describ
 * `subscribe( eventPattern, callback, options )`
 
   This creates a subscription on the event bus.
-  The `eventPattern` is a prefix for events to subscribe to: 
+  The `eventPattern` is a prefix for events to subscribe to:
   Events that start with the given sequence of (sub-)topics will be handled by this subscription.
 
 * `publish( eventName, payload )`
@@ -196,11 +252,16 @@ It only has a few essential methods that allow to implement all patterns describ
   Returns a promise that is resolved when all _did_-responses have been received.
 
 
-TODO
 
 <a name="grammar"></a>
-### Event Grammar
+### Event Name Grammar
 
-This is the formal grammar for events:
+This is the formal grammar for events names, in [EBNF](http://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_Form):
 
-TODO
+```EBNF
+
+    <event-name> ::= <topic-id> [ '.' <topic-id> ]*
+    <topic-id> ::= <sub-topic-id> [ '-' <sub-topic-id> ]*
+    <sub-topic-id> ::= [a-z][+a-zA-Z0-9]* | [A-Z][+A-Z0-9]*
+
+```
