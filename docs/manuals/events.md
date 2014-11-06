@@ -229,6 +229,8 @@ For application patterns that help widgets to interact with each other, refer to
 
 ## Event Reference
 
+The single relevant API provided by LaxarJS is the event bus.
+This section lists the exact details of using it, and on how event names may be constructed.
 
 ### The Event Bus API
 
