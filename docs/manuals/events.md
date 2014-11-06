@@ -150,7 +150,7 @@ Have a good look at all of them before coming up with your own patterns, in orde
 The core event patterns allow widgets to interact with the LaxarJS runtime.
 They are related to initialization and
 
-#### Page Life Cycle
+#### Page Lifecycle
 
 After all widget controllers have been instantiated, the runtime publishes a `beginLifecycleRequest` event.
 Widgets that need to publish events on page load should do so _after_ receiving this event, ensuring that all receivers have been set up when their events are delivered.
