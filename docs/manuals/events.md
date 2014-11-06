@@ -30,6 +30,7 @@ During event delivery, each event name is matched against each subscription, and
 
 Each event has a _name_ containing a summary of what happened, and a _payload_ carrying additional information.
 
+
 ### Event Names
 
 Event names summarize _what happened_, possibly with some additional context.
@@ -57,6 +58,7 @@ _Invalid_ event names include:
   * `DidReplace.myShoppingCart`: _invalid,_ first topic starts upper case but contains lower case letters
   * `.searchArticles.SUCCESS`: _invalid,_ empty topic is not allowed
   * `didUpdate.1up`: _invalid_, topic must not start with a number
+
 
 #### Naming Best Practices and Event Patterns
 
@@ -99,7 +101,7 @@ Sometimes a widget has to request for some other widget or activity on the page 
 This might be a longer running action such as a search or some server side validation.
 The requesting widget does not care about _who_ actually performs the request, but it is interested in _when_ the request has been fully processed by all respondents, and what is the outcome.
 
-As an example, consider a multi-part user sign-up process, where each of several widgets allows the user to enter and validate some of the information such as E-Mail Address, payment information or a CAPTCHA.
+As an example, consider a multi-part user sign-up process, where each of several widgets allows the user to enter and validate some of the information such as email address, payment information or a CAPTCHA.
 Another widget offering a _Complete Sign-Up_ button would be responsible for the overall process of submitting the registration resource to a REST service and navigating to a different page.
 Before hitting the registration service, this widget would ask all input widgets to validate their respective validation details in order to provide immediate feedback to the user.
 Some of the widgets might have to query their own validation services though, such as the CAPTCHA widget.
@@ -132,10 +134,10 @@ Using the _Request/Will/Did_ mechanism, such functionality can be achieved witho
 
 This mechanism allows any of the widgets on the page may be removed or replaced without any of the other widgets having to know.
 New widgets may be added at any time, and will work as long as they support the validation pattern.
-For example, message display widget could be added to gather and display validation messages to the user, simply by hooking it up to the same resource and processing its `"didValidate"` events.
+For example, the message display widget could be added to gather and display validation messages to the user, simply by hooking it up to the same resource and processing its `"didValidate"` events.
 Even if some widgets do not support the validation pattern, they can still be used, only that their validation would have to be handled by the server upon submission of the registration form.
 
-Validation and other patterns are described in the [pattern reference](#pattern-reference) below.
+Validation and other patterns are described in the following paragraph below.
 
 
 <a name="pattern-reference"></a>
@@ -144,11 +146,13 @@ Validation and other patterns are described in the [pattern reference](#pattern-
 A few event patterns are supported directly by LaxarJS, while others are described in the _LaxarJS Patterns_ library.
 Have a good look at all of them before coming up with your own patterns, in order to maximize the synergy of your widgets, especially when aiming for reuse.
 
+
 <a name="core-pattern"></a>
 ### Core Patterns
 
 The core event patterns allow widgets to interact with the LaxarJS runtime.
-They are related to initialization and
+They are related to initialization of pages and navigation between them.
+
 
 #### Page Lifecycle
 
@@ -176,7 +180,6 @@ Event name                            | Payload Attribute | Description
                                       | `lifecycleId`     | _see above_
 
 
-
 <a name="navigation"></a>
 #### Navigation
 
@@ -192,9 +195,9 @@ When _initiating navigation_, the LaxarJS runtime will:
 
   1. extract any place parameters from the event payload of the request event
   2. publish a `willNavigate.{target}` event with the corresponding target and parameters
-  3. publish an `endLifeCycle` event and wait any respondents
+  3. publish an `endLifecycle` event and wait for any respondents
   4. perform navigation by destroying the current page and loading the page associated with the new place
-  3. publish a `beginLifeCycle` event and wait any respondents
+  3. publish a `beginLifecycle` event and wait for any respondents
   5. publish a `didNavigate.{target}` event, with the corresponding target and parameters as well as the resolved place
 
 Here is the summary of navigation events:
@@ -211,6 +214,7 @@ Event name                 | Payload Attribute | Description
                            | `place`           | the actual place that was navigated to, now the current place
 
 More information on navigation is available in the ["Flow and Places" manual](./flow_and_places.md).
+
 
 #### Locales and i18n
 
@@ -250,11 +254,10 @@ It only has a few essential methods that allow to implement all patterns describ
   Returns a promise that is resolved when all _did_-responses have been received.
 
 
-
 <a name="grammar"></a>
 ### Event Name Grammar
 
-This is the formal grammar for events names, in [EBNF](http://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_Form):
+This is the formal grammar for event names, in [EBNF](http://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_Form):
 
 ```EBNF
 
