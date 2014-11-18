@@ -39,8 +39,14 @@ Let us dissect the startup process of a LaxarJS application based on the `debug.
 </html>
 ```
 
-The `axPage` directive determines where LaxarJS will insert the template for the current page.
-The `ngView` directive is used to trigger the [$ngRoute]()-service, which LaxarJS uses for URL handling. 
+What do the individual tags mean?
+
+  * The `axPage` directive determines where LaxarJS will place the layout for the current page.
+
+  * The `ngView` directive integrates the [$ngRoute](https://docs.angularjs.org/api/ngRoute)-service, which the [LaxarJS flow] uses for URL routing.
+  
+  * The `application/application.js` contains the [LaxarJS configuration]() for your application.
+    You can inline the code into your HTML for maximum performance, but keeping it this way makes it easy to manage configuration centrally, and to use it for both debug and release versions.
 
 ### The Page Blocker
 
