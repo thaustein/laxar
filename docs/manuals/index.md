@@ -29,6 +29,10 @@ Before starting with the manuals, make sure that you know [what LaxarJS is about
 
     How to create reusable, interactive elements that support themes.
 
+* [Infrastructure and Tools](infr.md)
+
+    How to create reusable, interactive elements that support themes.
+
 
 ## Advanced Manuals
 
