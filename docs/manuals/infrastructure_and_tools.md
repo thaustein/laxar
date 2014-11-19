@@ -22,6 +22,8 @@ Additionally, there is an `index.html` that allows you to run the application us
 In your own application, you do not have to actually use these files:
 Instead you may copy the relevant parts into a [Ruby on Rails](http://rubyonrails.org/) or [Django](https://www.djangoproject.com/) template, or into a [JSP](http://en.wikipedia.org/wiki/JavaServer_Pages) and bootstrap LaxarJS from there.
 
+### Scaffolding
+
 Let us dissect the startup process of a LaxarJS application based on the `debug.html`, only that we have removed everything that is not absolutely required:
 
 ```HTML
@@ -39,14 +41,30 @@ Let us dissect the startup process of a LaxarJS application based on the `debug.
 </html>
 ```
 
-What do the individual tags mean?
+What do the individual elements mean?
 
   * The `axPage` directive determines where LaxarJS will place the layout for the current page.
 
   * The `ngView` directive integrates the [$ngRoute](https://docs.angularjs.org/api/ngRoute)-service, which the [LaxarJS flow] uses for URL routing.
   
-  * The `application/application.js` contains the [LaxarJS configuration]() for your application.
-    You can inline the code into your HTML for maximum performance, but keeping it this way makes it easy to manage configuration centrally, and to use it for both debug and release versions.
+  * The `application/application.js` contains the [LaxarJS configuration](./configuration.md) for your application.
+    The `data-ax-application-mode` attribute allows to differentiate configuration between _DEBUG_ and _RELEASE_ mode.
+    It allows you to use bundled CSS, HTML and JSON assets for production, while always using their fresh source version during development. 
+    The attribute is not used by LaxarJS itself, but only by the `application.js` which is under your control, so using it is a convention rather than an API.
+
+  * The `require_config.js` configures paths to libraries for [AMD-loading](http://requirejs.org/docs/whyamd.html).
+    These may be your own libraries or 3rd party libraries installed through [Bower](http://bower.io/).
+    
+  * Finally, [RequireJS](http://requirejs.org) is loaded to bootstrap your application:
+    The `data-main` tells RequireJS where to find the initialization code (`init.js`), which is the entry point to all AMD-modules for your application.
+    AngularJS modules are automatically loaded for any [widgets/activities](./widgets_and_activities.md) and [controls](./providing_controls.md) that are reachable from your [flow](./flow_and_places.md):   
+    a LaxarJS grunt-task prepares this list whenever you `npm install` your application or `npm start` the development server, so usually you will not have manage AngularJS modules manually.
+    For production (`grunt optimize`, see below), all RequireJS dependencies are combined and minified by default.
+
+
+### Setup
+
+
 
 ### The Page Blocker
 
