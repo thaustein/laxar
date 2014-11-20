@@ -56,12 +56,12 @@ What do the individual elements mean?
   * Finally, [RequireJS](http://requirejs.org) is loaded to bootstrap your application:
     The `data-main` tells RequireJS where to find the initialization code (`init.js`), which is the entry point to all AMD-modules for your application.
     AngularJS modules are automatically loaded for any [widgets/activities](./widgets_and_activities.md) and [controls](./providing_controls.md) that are reachable from your [flow](./flow_and_places.md):   
-    a LaxarJS grunt task prepares this list whenever you `npm install` your application or `npm start` the development server, so usually you will not have manage AngularJS modules manually.
+    A LaxarJS grunt task prepares this list whenever you `npm install` your application or `npm start` the development server, so usually you will not to have manage AngularJS modules manually.
     For production (`grunt optimize`, see below), all RequireJS dependencies are combined and minified by default.
 
 The HTML files in the application template also contain an optional `axPageFade` and associated styles.
-This creates a _page blocker_ that covers your application with a white layer during startup and then fades out, to may make loading a bit nicer on the eyes.
-However, this may not be right for all applications, so feel free to remove the page blocker, or replace it with a custom version.
+This creates an overlay that covers your application with a white layer during navigation and then fades out, to may make loading a bit nicer on the eyes.
+However, this may not be right for all applications, so feel free to remove the overlay, or replace it with a custom version.
 
 
 ### Startup
@@ -182,8 +182,8 @@ The aliases make sure that task dependencies are observed, plus they are easier 
 
 ### The LaxarJS Development Server
 
-The development server based on based on [Express](http://expressjs.com/) helps to run your application without having to setup a full-blown web server.
-It polls for changes to your widgets and automatically refreshes the browser by injecting .
+The development server based on based on [Connect middleware](https://github.com/senchalabs/connect) helps to run your application without having to setup a full-blown web server.
+It polls for changes to your widgets and automatically refreshes the browser by injecting a [live reload](https://github.com/intesso/connect-livereload) script.
 By default, the development server runs on port 8000, but this can be configured in the Gruntfile.
 The directories that are watched for live reload can also be reconfigured.
 This may be necessary if you are developing a library within in your project, and that library does not belong to a single widget.
