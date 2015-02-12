@@ -2,6 +2,7 @@
 
 ## Last Changes
 
+- [#150](https://github.com/LaxarJS/laxar/issues/150): documentation: created basic CONTRIBUTING.md
 - [#148](https://github.com/LaxarJS/laxar/issues/148): documentation: more detailed information on the event bus, link to api doc
 
 
