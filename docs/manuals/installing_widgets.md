@@ -31,7 +31,8 @@ git submodule add https://github.com/laxarjs/ax-headline-widget.git includes/wid
 ```
 
 Instead of using git, you can also copy the widget from somewhere, unpack it from a zip archive or obtain it in any other way.
-You just have to make sure that the widget's files are located under `includes/widgets/<package path>`, where the package path is given by the widget's `bower.json` (specifically by the `name` field).
+You just have to make sure that the widget's files are located under `includes/widgets/<artifact>`, where the artifact value is given by the widget's `bower.json` (specifically by the `name` field).
+For widgets obtained from GitHub, this is usually equivalent to the `user/repository` information.
 In the example, the package path is `laxarjs/ax-headline-widget`.
 
 
@@ -45,7 +46,8 @@ Usually, you can automate that process using `bower` itself:
 bower install --save ./includes/widgets/category/widget`
 ```
 
-This will also install the widget itself as a bower component, which is not needed but also should not hurt.
+_Note:_ This will also install the widget itself as a bower component, which is not needed but also should not hurt.
+
 
 ### 3. Configure Paths for RequireJS
 
@@ -53,8 +55,9 @@ This is only relevant if your widget has its own bower-dependencies (step 2):
 The _Installation_ section of your widget should tell you if any changes need to be made to your RequireJS configuration.
 Usually, you will need to ensure that all bower-dependencies have a corresponding require path configuration.
 
+Now you can use the new widget within your pages, by using the artifact value from step 1 in your page configuration. 
 
 
-## Installing Widgets Manually
+## Installing Widgets Automatically
 
-This is still in the works: for LaxarJS v1.0, we plan to automate all three steps, possibly using `bower` and [bower-requirejs](https://github.com/yeoman/bower-requirejs).
+This is still in the works: for LaxarJS [v1.0](https://github.com/LaxarJS/laxar/issues?q=is%3Aopen+is%3Aissue+label%3Ablocks-1.0), we are evaluating to automate all three steps, possibly using `bower` and [bower-requirejs](https://github.com/yeoman/bower-requirejs).
